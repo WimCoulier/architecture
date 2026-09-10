@@ -358,7 +358,6 @@ sequenceDiagram
     Note over RPI: Delete transaction content (Art. 5b(10), RPI_10)
 - Wallet holders must be able to verify both RPI and RP identities
 ``
-``
 
 ## Governance Responsibilities
 
