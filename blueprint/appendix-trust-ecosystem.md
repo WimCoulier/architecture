@@ -177,26 +177,6 @@ The following sequence illustrates how a Wallet Instance discovers and validates
 ```mermaid
 sequenceDiagram
     participant W as Wallet Instance
-    participant RP as Relying Party
-    participant TL as Trusted List
-    participant NR as National Register API
-    participant OCSP as OCSP/CRL Responder
-    participant RCStatus as WRPRC Status List API
-
-    RP->>W: 1. Presentation Request (WRPAC + WRPRC if available)
-    Note over W: 2. Extract RP WRPAC<br/>(from TLS or signed request)
-    W->>TL: 3. Fetch Trusted List
-    TL-->>W: 4. Trusted List Response
-    Note over W: 5. Validate RP WRPAC<br/>- Check CA in TSP list<br/>- Verify service status: "granted"
-    W->>OCSP: 6. HTTPS GET /ocsp or /crl<br/>for WRPAC status
-    OCSP-->>W: 7. OCSP/CRL HTTP Response
-
-    alt WRPRC provided by RP
-        Note over W: 8a. Validate WRPRC signature<br/>- Verify WRPRC Provider in Trusted List
-    else WRPRC not provided
-        W->>NR: 8b. Query National Register<br/>by RP identifier from WRPAC
-        NR-->>W: 9. Return RP WRPRC(s)
-        Note over W: 10. Validate WRPRC signature
     participant RP as Relying Party or Intermediary
     participant TL as Trusted List or List of Trusted Entities
     participant OCSP as OCSP/CRL Responder
@@ -215,10 +195,7 @@ sequenceDiagram
     RCStatus-->>W: 10. Status List HTTP Response
     Note over W: 11. Verify requested attributes in the same WRPRC (RPRC_21)
 
-    W->>RCStatus: 11. HTTPS GET /wrprc/status-list<br/>(WRPRC status check)
-    RCStatus-->>W: 12. Status List HTTP Response
-
-    Note over W: 13. Extract and Verify Entitlements from WRPRC<br/>- Parse entitlements<br/>- Validate requested attributes against entitlements
+    Note over W: 12. Extract and Verify Entitlements from WRPRC<br/>- Parse entitlements<br/>- Validate requested attributes against entitlements
 ```
 
 If the presentation is intermediated, the Wallet Unit authenticates the **intermediary’s WRPAC**, not the intermediated RP’s. The intermediated RP is identified from the **WRPRC in the request** (**RPRC_19**); the WRPRC association to the intermediary must match the authenticated WRPAC (**RPI_06**, **RPRC_04**, **RPRC_17a**; ETSI TS 119 475 §4.5). The Wallet **SHALL NOT** display the intermediary’s trade names (**RPI_07**). See [Relying Party Intermediaries in the Trust Ecosystem](#relying-party-intermediaries-in-the-trust-ecosystem).
@@ -335,7 +312,6 @@ Intermediaries are a special class of Relying Party. Article 5b(10) of the Europ
 5. If the parties so agreed, the intermediary may perform PID/attestation validation on behalf of the RP (delegation of Article 5b(9) checks: **OIA_12**–**OIA_15**). What is validated is a contractual choice; the ARF does not mandate the RPI–RP interface, nor end-to-end encryption to the RP. Forward only to that RP; verify if agreed; delete immediately (**RPI_08**–**RPI_10**).
 6. The intermediary forwards attributes to the RP and **deletes** PIDs, attestations, and transaction-content data immediately (Article 5b(10); ARF §6.6.5).
 
-~~~~
 ```mermaid
 sequenceDiagram
     participant RP as Intermediated RP
@@ -356,8 +332,9 @@ sequenceDiagram
     end
     RPI->>RP: Forward attributes (RPI_08/09)
     Note over RPI: Delete transaction content (Art. 5b(10), RPI_10)
+```
+
 - Wallet holders must be able to verify both RPI and RP identities
-``
 
 ## Governance Responsibilities
 
